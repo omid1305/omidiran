@@ -3,6 +3,7 @@ import base64
 import json
 import os
 import hashlib
+import hmac
 import secrets
 import string
 import time
@@ -444,32 +445,63 @@ AUTH = {
     "username": ADMIN_USERNAME_DEFAULT,
     "password_hash": hash_password(ADMIN_PASSWORD_DEFAULT),
 }
-SESSIONS: dict = {}
-SESSIONS_LOCK = asyncio.Lock()
+def _session_b64encode(value: bytes) -> str:
+    """URL-safe base64 without padding, suitable for a cookie token."""
+    return base64.urlsafe_b64encode(value).rstrip(b"=").decode("ascii")
+
+
+def _session_b64decode(value: str) -> bytes:
+    return base64.urlsafe_b64decode(value + "=" * (-len(value) % 4))
+
+
+def _session_auth_fingerprint() -> str:
+    """Bind sessions to the current credentials so password changes invalidate old cookies."""
+    material = f"{AUTH['username']}\0{AUTH['password_hash']}".encode("utf-8")
+    return hashlib.sha256(material).hexdigest()
+
 
 async def create_session() -> str:
-    token = secrets.token_urlsafe(32)
-    async with SESSIONS_LOCK:
-        SESSIONS[token] = time.time() + SESSION_TTL
-    return token
+    """Create a stateless, signed session cookie.
+
+    Unlike an in-memory session dictionary, this token can be verified by any
+    Vercel Function instance as long as SECRET_KEY and credentials are the same.
+    """
+    payload = {
+        "v": 1,
+        "exp": int(time.time()) + SESSION_TTL,
+        "nonce": secrets.token_urlsafe(18),
+        "auth": _session_auth_fingerprint(),
+    }
+    encoded = _session_b64encode(json.dumps(payload, separators=(",", ":")).encode("utf-8"))
+    signature = hmac.new(CONFIG["secret"].encode("utf-8"), encoded.encode("ascii"), hashlib.sha256).digest()
+    return f"{encoded}.{_session_b64encode(signature)}"
+
 
 async def is_valid_session(token: str | None) -> bool:
-    if not token:
+    """Verify the session locally without relying on per-instance RAM or disk."""
+    if not token or token.count(".") != 1:
         return False
-    async with SESSIONS_LOCK:
-        exp = SESSIONS.get(token)
-        if exp is None:
+    encoded, supplied_sig = token.split(".", 1)
+    try:
+        signature = hmac.new(CONFIG["secret"].encode("utf-8"), encoded.encode("ascii"), hashlib.sha256).digest()
+        if not hmac.compare_digest(_session_b64encode(signature), supplied_sig):
             return False
-        if exp < time.time():
-            SESSIONS.pop(token, None)
+        payload = json.loads(_session_b64decode(encoded).decode("utf-8"))
+        if not isinstance(payload, dict) or payload.get("v") != 1:
             return False
-        return True
+        if int(payload.get("exp", 0)) < int(time.time()):
+            return False
+        if not hmac.compare_digest(str(payload.get("auth", "")), _session_auth_fingerprint()):
+            return False
+        return bool(payload.get("nonce"))
+    except (ValueError, TypeError, UnicodeError, json.JSONDecodeError, base64.binascii.Error):
+        return False
+
 
 async def destroy_session(token: str | None):
-    if not token:
-        return
-    async with SESSIONS_LOCK:
-        SESSIONS.pop(token, None)
+    # Stateless cookies cannot be revoked in server-side memory. Logout clears the
+    # browser cookie; credential changes invalidate every prior token via fingerprint.
+    return None
 
 async def require_auth(request: Request):
     token = request.cookies.get(SESSION_COOKIE)
@@ -1203,9 +1235,6 @@ async def api_change_credentials(request: Request, token=Depends(require_auth)):
 
     # Invalidate all sessions and issue a fresh one for the current browser.
     fresh_token = await create_session()
-    async with SESSIONS_LOCK:
-        SESSIONS.clear()
-        SESSIONS[fresh_token] = time.time() + SESSION_TTL
 
     await save_state()
     log_activity("auth", f'Panel credentials changed: {", ".join(changed)}', "ok")
@@ -1230,9 +1259,6 @@ async def api_change_credentials_from_legacy(body: dict, token: str):
         raise HTTPException(status_code=400, detail="New password must be at least 4 characters")
     AUTH["password_hash"] = hash_password(new)
     fresh_token = await create_session()
-    async with SESSIONS_LOCK:
-        SESSIONS.clear()
-        SESSIONS[fresh_token] = time.time() + SESSION_TTL
     await save_state()
     log_activity("auth", "Panel password changed", "ok")
     resp = JSONResponse({"ok": True, "username": AUTH["username"]})
