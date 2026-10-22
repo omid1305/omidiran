@@ -192,8 +192,11 @@ On the first `/start`, the user is asked to choose a language and the selection 
 - Per-configuration IP limits
 - Active / Expiry / Quota checks before allowing connections
 - State stored in `gateway_state.json`
+- Persistent sessions stored in `gateway_sessions.json`; only SHA-256 hashes of session tokens are written to disk.
 
-For Railway deployment, mount `/data` as a persistent Volume so State and Secret files survive restarts and redeployments.
+For Railway deployment, mount `/data` as a persistent Volume so State, Secret, and login sessions survive restarts and redeployments. This release keeps a single replica by default.
+
+**Vercel note:** this ZIP is a unified FastAPI application that relies on persistent files under `DATA_DIR` and in-process runtime state. Directly deploying the whole project to Vercel is not a reliable deployment model for the panel. Run the complete panel on Railway with a Volume mounted at `/data`. Keeping a Vercel domain in front as a proxy/frontend requires a separate, explicitly tested rewrite for API and WebSocket routes.
 
 ---
 
