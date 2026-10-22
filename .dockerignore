@@ -63,6 +63,7 @@ desktop.ini
 data/
 gateway_state.json
 gateway_secret.key
+gateway_sessions.json
 *.log
 logs/
 *.tmp
