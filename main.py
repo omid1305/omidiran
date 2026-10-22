@@ -87,7 +87,6 @@ async def lifespan(app: FastAPI):
 
     # Persistence must be available before the panel starts serving traffic.
     await verify_persistence()
-    await load_sessions()
     await load_state()
     await _tg_start_bot()
     autosave_task = asyncio.create_task(_autosave_loop(), name="omid-state-autosave")
@@ -126,9 +125,6 @@ _configured_data_dir = (os.environ.get("DATA_DIR") or "/data").strip()
 DATA_DIR = Path(_configured_data_dir).expanduser()
 DATA_FILE = DATA_DIR / "gateway_state.json"
 SECRET_FILE = DATA_DIR / "gateway_secret.key"
-# Session records are stored separately from the panel state and contain only
-# SHA-256 digests of session tokens (never the browser's raw bearer token).
-SESSIONS_FILE = DATA_DIR / "gateway_sessions.json"
 SAVE_LOCK = asyncio.Lock()
 autosave_task: asyncio.Task | None = None
 try:
@@ -198,16 +194,46 @@ def _write_state_file_sync(path: Path, payload: str) -> None:
             os.close(dir_fd)
 
 async def verify_persistence() -> None:
-    """Verify that DATA_DIR is writable before the service starts serving traffic."""
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    probe = DATA_DIR / f".omid_persistence_probe_{os.getpid()}"
-    try:
+    """Verify storage. On Vercel, fall back to its writable temporary directory.
+
+    IMPORTANT: /tmp on Vercel is ephemeral and instance-local. This fallback only
+    prevents startup from crashing; it does NOT provide durable/shared state. Use
+    Railway with a mounted /data volume (or an external database) for production.
+    """
+    global DATA_DIR, DATA_FILE, SECRET_FILE
+
+    async def probe_dir(path: Path) -> None:
+        await asyncio.to_thread(path.mkdir, parents=True, exist_ok=True)
+        probe = path / f".omid_persistence_probe_{os.getpid()}"
         await asyncio.to_thread(probe.write_text, "ok", encoding="utf-8")
         await asyncio.to_thread(probe.unlink)
+
+    try:
+        await probe_dir(DATA_DIR)
         logger.info(f"Persistence ready: {DATA_DIR} (state: {DATA_FILE})")
-    except Exception as e:
-        logger.error(f"Persistent storage is NOT writable: {DATA_DIR}: {e}")
-        raise RuntimeError(f"Persistent storage is not writable: {DATA_DIR}") from e
+        return
+    except OSError as e:
+        logger.warning(f"Configured DATA_DIR is not writable ({DATA_DIR}): {e}")
+        if not (os.environ.get("VERCEL") or os.environ.get("NOW_REGION")):
+            logger.error(f"Persistent storage is NOT writable: {DATA_DIR}: {e}")
+            raise RuntimeError(f"Persistent storage is not writable: {DATA_DIR}") from e
+
+    # Vercel Functions have a read-only deployment filesystem; /tmp is writable
+    # but temporary and not shared across instances. Never use /temp/data here.
+    fallback = Path("/tmp/omid-panel-data")
+    try:
+        await probe_dir(fallback)
+    except OSError as e:
+        logger.exception("Vercel temporary storage is not writable either")
+        raise RuntimeError("Neither configured DATA_DIR nor Vercel /tmp is writable") from e
+
+    DATA_DIR = fallback
+    DATA_FILE = DATA_DIR / "gateway_state.json"
+    SECRET_FILE = DATA_DIR / "gateway_secret.key"
+    logger.warning(
+        "Using ephemeral Vercel storage at %s. State may disappear between invocations; "
+        "this is a startup workaround, not durable production storage.", DATA_DIR
+    )
 
 async def load_state():
     global LINKS, AUTH, SUBS
@@ -418,92 +444,32 @@ AUTH = {
     "username": ADMIN_USERNAME_DEFAULT,
     "password_hash": hash_password(ADMIN_PASSWORD_DEFAULT),
 }
-SESSIONS: dict[str, float] = {}
+SESSIONS: dict = {}
 SESSIONS_LOCK = asyncio.Lock()
-
-
-def _session_key(token: str) -> str:
-    """Hash the opaque browser token before using it as a storage key."""
-    return hashlib.sha256(token.encode("utf-8")).hexdigest()
-
-
-async def _persist_sessions_locked() -> None:
-    """Persist hashed session IDs atomically. Caller must hold SESSIONS_LOCK."""
-    payload = json.dumps(SESSIONS, separators=(",", ":"), sort_keys=True)
-    await asyncio.to_thread(_write_state_file_sync, SESSIONS_FILE, payload)
-
-
-async def load_sessions() -> None:
-    """Restore unexpired sessions on startup (requires persistent DATA_DIR)."""
-    try:
-        DATA_DIR.mkdir(parents=True, exist_ok=True)
-        if not SESSIONS_FILE.exists():
-            logger.info("No persisted sessions found; starting with an empty session store")
-            return
-        async with aiofiles.open(SESSIONS_FILE, "r", encoding="utf-8") as f:
-            raw = await f.read()
-        parsed = json.loads(raw or "{}")
-        now = time.time()
-        cleaned: dict[str, float] = {}
-        if isinstance(parsed, dict):
-            for key, expiry in parsed.items():
-                try:
-                    expiry_num = float(expiry)
-                except (TypeError, ValueError):
-                    continue
-                if isinstance(key, str) and len(key) == 64 and expiry_num > now:
-                    cleaned[key] = expiry_num
-        async with SESSIONS_LOCK:
-            SESSIONS.clear()
-            SESSIONS.update(cleaned)
-            # Rewrite only if expired/invalid records were removed.
-            should_rewrite = not isinstance(parsed, dict) or len(cleaned) != len(parsed)
-            if should_rewrite:
-                await _persist_sessions_locked()
-        logger.info("Restored %d unexpired panel session(s)", len(cleaned))
-    except Exception as exc:
-        # Treat corrupt session data as logged-out sessions, not as a startup failure.
-        logger.warning("Could not restore persisted sessions; users may need to log in again: %s", exc)
-
 
 async def create_session() -> str:
     token = secrets.token_urlsafe(32)
     async with SESSIONS_LOCK:
-        SESSIONS[_session_key(token)] = time.time() + SESSION_TTL
-        await _persist_sessions_locked()
+        SESSIONS[token] = time.time() + SESSION_TTL
     return token
-
-
-async def replace_sessions_with(token: str) -> None:
-    """Invalidate every old session and persist a fresh session for this browser."""
-    async with SESSIONS_LOCK:
-        SESSIONS.clear()
-        SESSIONS[_session_key(token)] = time.time() + SESSION_TTL
-        await _persist_sessions_locked()
-
 
 async def is_valid_session(token: str | None) -> bool:
     if not token:
         return False
-    key = _session_key(token)
     async with SESSIONS_LOCK:
-        exp = SESSIONS.get(key)
+        exp = SESSIONS.get(token)
         if exp is None:
             return False
         if exp < time.time():
-            SESSIONS.pop(key, None)
-            await _persist_sessions_locked()
+            SESSIONS.pop(token, None)
             return False
         return True
-
 
 async def destroy_session(token: str | None):
     if not token:
         return
-    key = _session_key(token)
     async with SESSIONS_LOCK:
-        if SESSIONS.pop(key, None) is not None:
-            await _persist_sessions_locked()
+        SESSIONS.pop(token, None)
 
 async def require_auth(request: Request):
     token = request.cookies.get(SESSION_COOKIE)
@@ -1236,8 +1202,10 @@ async def api_change_credentials(request: Request, token=Depends(require_auth)):
         raise HTTPException(status_code=400, detail="No changes were made")
 
     # Invalidate all sessions and issue a fresh one for the current browser.
-    fresh_token = secrets.token_urlsafe(32)
-    await replace_sessions_with(fresh_token)
+    fresh_token = await create_session()
+    async with SESSIONS_LOCK:
+        SESSIONS.clear()
+        SESSIONS[fresh_token] = time.time() + SESSION_TTL
 
     await save_state()
     log_activity("auth", f'Panel credentials changed: {", ".join(changed)}', "ok")
@@ -1261,8 +1229,10 @@ async def api_change_credentials_from_legacy(body: dict, token: str):
     if len(new) < 4:
         raise HTTPException(status_code=400, detail="New password must be at least 4 characters")
     AUTH["password_hash"] = hash_password(new)
-    fresh_token = secrets.token_urlsafe(32)
-    await replace_sessions_with(fresh_token)
+    fresh_token = await create_session()
+    async with SESSIONS_LOCK:
+        SESSIONS.clear()
+        SESSIONS[fresh_token] = time.time() + SESSION_TTL
     await save_state()
     log_activity("auth", "Panel password changed", "ok")
     resp = JSONResponse({"ok": True, "username": AUTH["username"]})
