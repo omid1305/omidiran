@@ -1120,8 +1120,8 @@ async def _run_trojan(
         _remove_connection(conn_id)
 
         try:
-            if main is not None and hasattr(main, "save_state"):
-                asyncio.create_task(main.save_state())
+            if main is not None and hasattr(main, "request_save"):
+                main.request_save()
         except Exception:
             pass
 

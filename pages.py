@@ -140,7 +140,7 @@ __LOGIN_CSS__
 <div class="scan"></div><div class="shell">
   <div class="hud"><span class="kicker">OMID-01 / SECURE ACCESS GATE</span><div style="display:flex;gap:6px"><button class="lang" id="lang-login" type="button">EN</button><button class="lang" id="theme-login" type="button">☼</button></div></div>
   <div class="card">
-    <div class="brand"><div class="brand-img"><img src="data:image/png;base64,__LOGO_B64__" alt="OMID"></div><div><div class="brand-name">OMID-IRAN PANEL</div><div class="brand-sub">Free For All · v2.5.0</div></div></div>
+    <div class="brand"><div class="brand-img"><img src="data:image/png;base64,__LOGO_B64__" alt="OMID"></div><div><div class="brand-name">OMID-IRAN PANEL</div><div class="brand-sub">Free For All · v2.0.0</div></div></div>
     <h1>Sign in to <span class="accent">OMID-IRAN PANEL</span></h1>
     <p class="sub">Enter your credentials to access the control panel</p>
     <div class="err" id="err"><i class="ti ti-alert-circle"></i><span id="err-text"></span></div>
@@ -151,7 +151,7 @@ __LOGIN_CSS__
     </form>
     <div class="meta-grid"><div class="meta"><span>NETWORK</span><b>OMID Network</b></div><div class="meta"><span>STATUS</span><b class="ok">● SYSTEM ONLINE</b></div></div>
     <div style="margin-top:10px;text-align:center;font-size:8.5px;color:var(--t3)">First run default: <b style="color:var(--accent)">omid / omid</b> · Support: <a href="https://t.me/omid_gamingORG" target="_blank" style="color:var(--accent-2);text-decoration:none">@omid_gamingORG</a></div>
-    <div class="foot"><span>Free For All</span><span>OMID-IRAN PANEL · v2.5.0</span></div>
+    <div class="foot"><span>Free For All</span><span>OMID-IRAN PANEL · v2.0.0</span></div>
   </div>
 </div>
 <script>
@@ -317,6 +317,32 @@ DASHBOARD_HTML = r"""<!DOCTYPE html>
 <style>__THEME_CSS__
 __DASHBOARD_CSS__
 </style>
+<style id="menu-css">
+.tabbar{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 18px;padding:5px;background:var(--surface-2);border:1px solid var(--card-b);border-radius:var(--radius-sm);width:fit-content;max-width:100%}
+.tab-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border:0;border-radius:10px;background:transparent;color:var(--t2);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s,box-shadow .2s}
+.tab-btn:hover{color:var(--t1);background:var(--accent-soft)}
+.tab-btn.on{background:var(--accent-grad);color:#fff;box-shadow:var(--accent-shadow)}
+.tab-btn .badge{font-size:10px;padding:2px 7px}
+.tabpane{display:none}.tabpane.on{display:block}
+.sys-card{margin-bottom:16px}
+.sys-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.sys-tile{padding:13px 15px;border:1px solid var(--hairline);border-radius:var(--radius-xs);background:var(--surface-2)}
+.sys-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+.sys-k{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--t2)}
+.sys-v{font-size:20px;font-weight:800;color:var(--t1)}
+.sys-sub{margin-top:8px;font-size:10.5px;color:var(--t3);direction:ltr;text-align:start}
+.sys-net{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--t2);direction:ltr}
+.sys-net b{color:var(--t1);font-size:15px}
+.sys-net small{font-size:10px;color:var(--t3);min-width:30px;display:inline-block}
+.fx-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.fx-seg button{display:flex;flex-direction:column;align-items:center;gap:5px;padding:16px 10px;border:1px solid var(--card-b);border-radius:var(--radius-sm);background:var(--surface-2);color:var(--t2);font-family:inherit;cursor:pointer;transition:border-color .2s,background .2s}
+.fx-seg button i{font-size:20px;color:var(--accent)}
+.fx-seg button b{font-size:14px;color:var(--t1)}
+.fx-seg button span{font-size:10.5px;color:var(--t3);text-align:center}
+.fx-seg button:hover{border-color:var(--card-bh)}
+.fx-seg button.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--focus-ring)}
+@media(max-width:560px){.fx-seg{grid-template-columns:1fr}.tab-btn{padding:8px 12px}}
+</style>
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -428,7 +454,7 @@ __DASHBOARD_CSS__
 <div class="mob-top">
   <div class="ml">
     <div class="mob-logo"><img src="data:image/png;base64,__LOGO_B64__" alt="OMID"></div>
-    <div class="mob-brand-copy"><span class="mob-title">OMID-IRAN PANEL</span><span class="mob-subtitle">Free For All · v2.5.0</span></div>
+    <div class="mob-brand-copy"><span class="mob-title">OMID-IRAN PANEL</span><span class="mob-subtitle">Free For All · v2.0.0</span></div>
   </div>
   <div class="mob-right">
     <span class="top-status"><span class="dot dg pulse"></span> SYSTEM ONLINE</span>
@@ -442,7 +468,7 @@ __DASHBOARD_CSS__
   <button class="sb-close" id="close-sb"><i class="ti ti-x"></i></button>
   <div class="logo">
     <div class="logo-img"><img src="data:image/png;base64,__LOGO_B64__" alt="OMID"></div>
-    <div><div class="logo-name">OMID-IRAN PANEL</div><div class="logo-sub">Free For All · v2.5.0</div><div class="logo-meta">OMID NETWORK NODE</div></div>
+    <div><div class="logo-name">OMID-IRAN PANEL</div><div class="logo-sub">Free For All · v2.0.0</div><div class="logo-meta">OMID NETWORK NODE</div></div>
   </div>
   <div class="side-telemetry">
     <div class="telemetry-head"><span>CORE TELEMETRY</span><span class="telemetry-led"></span></div>
@@ -455,16 +481,11 @@ __DASHBOARD_CSS__
     <div class="nav-sec"><span class="nav-sec-label">PANEL</span></div>
     <div class="nav-it on" data-pg="overview"><i class="ti ti-layout-dashboard"></i><span class="nav-label">Dashboard</span></div>
     <div class="nav-it" data-pg="links"><i class="ti ti-link-plus"></i><span class="nav-label">Configurations</span></div>
-    <div class="nav-it" data-pg="subgroups"><i class="ti ti-folders"></i><span class="nav-label">Subscription Groups</span></div>
-    <div class="nav-it" data-pg="subscriptions"><i class="ti ti-rss"></i><span class="nav-label">Subscriptions</span></div>
-    <div class="nav-it" data-pg="traffic"><i class="ti ti-chart-area"></i><span class="nav-label">Traffic</span></div>
+    <div class="nav-it" data-pg="subgroups"><i class="ti ti-folders"></i><span class="nav-label">Groups</span></div>
     <div class="nav-it" data-pg="connections"><i class="ti ti-plug-connected"></i><span class="nav-label">Connections</span></div>
     <div class="nav-sec"><span class="nav-sec-label">SYSTEM</span></div>
-    <div class="nav-it" data-pg="security"><i class="ti ti-shield-lock"></i><span class="nav-label">Security</span></div>
-    <div class="nav-it" data-pg="logs"><i class="ti ti-history"></i><span class="nav-label">Activity Logs</span></div>
-    <div class="nav-it" data-pg="errors"><i class="ti ti-alert-triangle"></i><span class="nav-label">Errors</span></div>
-    <div class="nav-it" data-pg="testws"><i class="ti ti-wifi"></i><span class="nav-label">WebSocket Test</span></div>
-    <div class="nav-it" data-pg="telegram"><i class="ti ti-brand-telegram"></i><span class="nav-label">Telegram Bot</span></div>
+    <div class="nav-it" data-pg="logs"><i class="ti ti-history"></i><span class="nav-label">Logs</span></div>
+    <div class="nav-it" data-pg="telegram"><i class="ti ti-brand-telegram"></i><span class="nav-label">Telegram</span></div>
     <div class="nav-it" data-pg="settings"><i class="ti ti-settings"></i><span class="nav-label">Settings</span></div>
     <div class="nav-it" data-pg="support"><i class="ti ti-headset"></i><span class="nav-label">Support</span></div>
   </div>
@@ -490,11 +511,25 @@ __DASHBOARD_CSS__
       <button class="btn btn-p btn-sm" onclick="refreshAll()"><i class="ti ti-refresh"></i> Refresh</button>
     </div>
   </div>
+  <div class="tabbar" data-tabgroup="ov">
+    <button class="tab-btn on" data-tab="main" onclick="pgTab('ov','main')"><i class="ti ti-layout-dashboard"></i> Overview</button>
+    <button class="tab-btn" data-tab="traffic" onclick="pgTab('ov','traffic')"><i class="ti ti-chart-area"></i> Traffic Details</button>
+  </div>
+  <div class="tabpane on" data-tabgroup="ov" data-tab="main">
   <div class="metrics">
     <div class="metric"><div class="m-icon"><i class="ti ti-plug-connected"></i></div><div class="m-label">Active Connections</div><div class="m-val" id="m-conns">—</div><div class="m-sub"><span class="dot dg pulse"></span> WebSocket / XHTTP Live</div></div>
     <div class="metric"><div class="m-icon"><i class="ti ti-transfer"></i></div><div class="m-label">Total Traffic</div><div class="m-val" id="m-traffic">—<span class="m-unit">MB</span></div><div class="m-sub">Since startup</div></div>
     <div class="metric suc"><div class="m-icon suc"><i class="ti ti-link"></i></div><div class="m-label">Active Configs</div><div class="m-val" id="m-alinks">—</div><div class="m-sub" id="m-lsub">of total</div></div>
     <div class="metric pur"><div class="m-icon pur"><i class="ti ti-folders"></i></div><div class="m-label">Subscription Groups</div><div class="m-val" id="m-subs">—</div><div class="m-sub">Active</div></div>
+  </div>
+  <div class="card sys-card" id="sys-card">
+    <div class="card-title"><i class="ti ti-cpu"></i> Server Resources <span class="ml-auto badge bg-blue" id="sys-meta">—</span></div>
+    <div class="sys-grid">
+      <div class="sys-tile"><div class="sys-top"><span class="sys-k"><i class="ti ti-cpu"></i> CPU</span><span class="sys-v" id="sys-cpu">—</span></div><div class="spbar"><div class="spfill" id="sys-cpu-bar" style="width:0%"></div></div><div class="sys-sub" id="sys-cpu-sub">—</div></div>
+      <div class="sys-tile"><div class="sys-top"><span class="sys-k"><i class="ti ti-device-desktop-analytics"></i> RAM</span><span class="sys-v" id="sys-ram">—</span></div><div class="spbar"><div class="spfill" id="sys-ram-bar" style="width:0%"></div></div><div class="sys-sub" id="sys-ram-sub">—</div></div>
+      <div class="sys-tile"><div class="sys-top"><span class="sys-k"><i class="ti ti-database"></i> Disk</span><span class="sys-v" id="sys-disk">—</span></div><div class="spbar"><div class="spfill" id="sys-disk-bar" style="width:0%"></div></div><div class="sys-sub" id="sys-disk-sub">—</div></div>
+      <div class="sys-tile"><div class="sys-top"><span class="sys-k"><i class="ti ti-arrows-up-down"></i> Network</span></div><div class="sys-net"><span><i class="ti ti-arrow-down"></i> <small>Down</small> <b id="sys-rx">—</b></span><span><i class="ti ti-arrow-up"></i> <small>Up</small> <b id="sys-tx">—</b></span></div><div class="sys-sub" id="sys-net-sub">—</div></div>
+    </div>
   </div>
   <div class="vless-box">
     <div class="vl-header">
@@ -506,7 +541,7 @@ __DASHBOARD_CSS__
       <button class="btn btn-p" onclick="cpText('vless-main')"><i class="ti ti-copy"></i> Copy</button>
       <button class="btn btn-g" onclick="qrFor('vless-main')"><i class="ti ti-qrcode"></i> QR</button>
       <button class="btn btn-o" onclick="navTo('links')"><i class="ti ti-link-plus"></i> Limited Config</button>
-      <button class="btn btn-pur" onclick="navTo('subgroups')"><i class="ti ti-folders"></i> Subscription Groups</button>
+      <button class="btn btn-pur" onclick="navTo('subgroups')"><i class="ti ti-folders"></i> Groups</button>
     </div>
   </div>
   <div class="g3">
@@ -532,8 +567,44 @@ __DASHBOARD_CSS__
       <div id="lsummary">—</div>
     </div>
   </div>
+  </div>
+  <div class="tabpane" data-tabgroup="ov" data-tab="traffic">
+  <div class="traf-hero">
+    <div class="traf-main-stat">
+      <div class="traf-main-label"><i class="ti ti-database"></i> Total traffic usage</div>
+      <div class="traf-main-val" id="t-traffic">—<span>MB</span></div>
+      <div class="traf-trend up" id="t-trend"><i class="ti ti-trending-up"></i> <span id="t-trend-val">—</span></div>
+    </div>
+    <div class="traf-mini">
+      <div class="traf-mini-top"><div class="traf-mini-icon"><i class="ti ti-arrow-up-right"></i></div><span class="traf-mini-label">Hourly average</span></div>
+      <div><div class="traf-mini-val" id="t-avg">—</div><div class="traf-mini-sub">MB per hour</div></div>
+    </div>
+    <div class="traf-mini">
+      <div class="traf-mini-top"><div class="traf-mini-icon pk"><i class="ti ti-chart-bar"></i></div><span class="traf-mini-label">Usage peak</span></div>
+      <div><div class="traf-mini-val" id="t-peak">—</div><div class="traf-mini-sub" id="t-peak-time">Peak hour</div></div>
+    </div>
+    <div class="traf-mini">
+      <div class="traf-mini-top"><div class="traf-mini-icon lo"><i class="ti ti-clock-hour-4"></i></div><span class="traf-mini-label">Lowest usage</span></div>
+      <div><div class="traf-mini-val" id="t-low">—</div><div class="traf-mini-sub">MB per hour</div></div>
+    </div>
+  </div>
+
+  <div class="traf-chart-card">
+    <div class="traf-chart-head">
+      <div>
+        <div class="traf-chart-title"><i class="ti ti-activity"></i> Traffic usage trend</div>
+        <div class="traf-chart-sub">Based on megabytes per hour</div>
+      </div>
+      <div class="traf-legend">
+        <div class="traf-legend-item"><span class="traf-legend-dot" style="background:var(--accent)"></span> Usage</div>
+        <div class="traf-legend-item"><span class="traf-legend-dot" style="background:var(--amber)"></span> Average</div>
+      </div>
+    </div>
+    <div class="traf-chart-body"><canvas id="ch3"></canvas></div>
+  </div>
+  </div>
   <div class="dash-footer">
-    <span class="df-text">OMID-IRAN PANEL v2.5.0 · OMID Network</span>
+    <span class="df-text">OMID-IRAN PANEL v2.0.0 · OMID Network</span>
     
     
   </div>
@@ -738,12 +809,17 @@ __DASHBOARD_CSS__
 </section>
 <section class="pg" id="pg-subgroups">
   <div class="topbar">
-    <div><div class="tb-title"><i class="ti ti-folders"></i> Subscription Groups</div><div class="tb-sub">Each group has a separate public page with its own configurations</div></div>
+    <div><div class="tb-title"><i class="ti ti-folders"></i> Groups</div><div class="tb-sub">Groups with their own public pages, and the subscription links for v2ray apps</div></div>
     <div class="tb-right">
       <span class="badge bg-purple" id="subs-pg-cnt">0 groups</span>
       <button class="btn btn-pur" onclick="openModal('modal-create-sub')"><i class="ti ti-folder-plus"></i> New Group</button>
     </div>
   </div>
+  <div class="tabbar" data-tabgroup="sg">
+    <button class="tab-btn on" data-tab="groups" onclick="pgTab('sg','groups')"><i class="ti ti-folders"></i> Groups</button>
+    <button class="tab-btn" data-tab="links" onclick="pgTab('sg','links')"><i class="ti ti-rss"></i> Subscription Links</button>
+  </div>
+  <div class="tabpane on" data-tabgroup="sg" data-tab="groups">
   <div class="subs-toolbar">
     <div class="subs-search">
       <i class="ti ti-search"></i>
@@ -753,9 +829,8 @@ __DASHBOARD_CSS__
   <div class="sub-grid" id="subs-grid">
     <div class="subs-empty-v2"><div class="subs-empty-v2-icon"><i class="ti ti-folders"></i></div><div class="subs-empty-v2-title">No groups yet</div><div class="subs-empty-v2-sub">Create a new group to organize configurations</div></div>
   </div>
-</section>
-<section class="pg" id="pg-subscriptions">
-  <div class="topbar"><div><div class="tb-title"><i class="ti ti-rss"></i> Subscriptions</div><div class="tb-sub">Subscription links for v2ray apps</div></div></div>
+  </div>
+  <div class="tabpane" data-tabgroup="sg" data-tab="links">
   <div class="g2">
     <div class="card">
       <div class="card-title"><i class="ti ti-rss"></i> Single subscription (per configuration)</div>
@@ -772,45 +847,6 @@ __DASHBOARD_CSS__
     <div class="card-title"><i class="ti ti-folders"></i> Group subscription links</div>
     <div id="sub-groups-list">Loading...</div>
   </div>
-</section>
-<section class="pg" id="pg-traffic">
-  <div class="topbar">
-    <div><div class="tb-title"><i class="ti ti-chart-area"></i> Traffic</div><div class="tb-sub">Bandwidth usage analysis & monitoring</div></div>
-    <div class="tb-right"><button class="btn btn-p btn-sm" onclick="refreshAll()"><i class="ti ti-refresh"></i> Refresh</button></div>
-  </div>
-
-  <div class="traf-hero">
-    <div class="traf-main-stat">
-      <div class="traf-main-label"><i class="ti ti-database"></i> Total traffic usage</div>
-      <div class="traf-main-val" id="t-traffic">—<span>MB</span></div>
-      <div class="traf-trend up" id="t-trend"><i class="ti ti-trending-up"></i> <span id="t-trend-val">—</span></div>
-    </div>
-    <div class="traf-mini">
-      <div class="traf-mini-top"><div class="traf-mini-icon"><i class="ti ti-arrow-up-right"></i></div><span class="traf-mini-label">Hourly average</span></div>
-      <div><div class="traf-mini-val" id="t-avg">—</div><div class="traf-mini-sub">MB per hour</div></div>
-    </div>
-    <div class="traf-mini">
-      <div class="traf-mini-top"><div class="traf-mini-icon pk"><i class="ti ti-chart-bar"></i></div><span class="traf-mini-label">Usage peak</span></div>
-      <div><div class="traf-mini-val" id="t-peak">—</div><div class="traf-mini-sub" id="t-peak-time">Peak hour</div></div>
-    </div>
-    <div class="traf-mini">
-      <div class="traf-mini-top"><div class="traf-mini-icon lo"><i class="ti ti-clock-hour-4"></i></div><span class="traf-mini-label">Lowest usage</span></div>
-      <div><div class="traf-mini-val" id="t-low">—</div><div class="traf-mini-sub">MB per hour</div></div>
-    </div>
-  </div>
-
-  <div class="traf-chart-card">
-    <div class="traf-chart-head">
-      <div>
-        <div class="traf-chart-title"><i class="ti ti-activity"></i> Traffic usage trend</div>
-        <div class="traf-chart-sub">Based on megabytes per hour</div>
-      </div>
-      <div class="traf-legend">
-        <div class="traf-legend-item"><span class="traf-legend-dot" style="background:var(--accent)"></span> Usage</div>
-        <div class="traf-legend-item"><span class="traf-legend-dot" style="background:var(--amber)"></span> Average</div>
-      </div>
-    </div>
-    <div class="traf-chart-body"><canvas id="ch3"></canvas></div>
   </div>
 </section>
 <section class="pg" id="pg-connections">
@@ -854,57 +890,23 @@ __DASHBOARD_CSS__
     <div class="conn-empty-v2-sub">Connections appear here as clients connect</div>
   </div>
 </section>
-<section class="pg" id="pg-security">
-  <div class="topbar"><div><div class="tb-title"><i class="ti ti-shield-lock"></i> Security</div></div></div>
-  <div class="g2">
-    <div class="card">
-      <div class="card-title"><i class="ti ti-lock"></i> Encryption</div>
-      <div class="sr"><span class="sr-k"><i class="ti ti-certificate"></i> TLS/HTTPS</span><span class="sr-v" style="color:var(--green-t)">● Active (443)</span></div>
-      <div class="sr"><span class="sr-k"><i class="ti ti-fingerprint"></i> Fingerprint</span><span class="sr-v">Chrome Spoof</span></div>
-      <div class="sr"><span class="sr-k"><i class="ti ti-network"></i> Protocols</span><span class="sr-v">VLESS/WS + XHTTP Ultra</span></div>
-      <div class="sr"><span class="sr-k"><i class="ti ti-key"></i> Password hash</span><span class="sr-v">SHA-256+Salt</span></div>
-      <div class="sr"><span class="sr-k"><i class="ti ti-cookie"></i> Session</span><span class="sr-v">HttpOnly · 7 days</span></div>
-    </div>
-    <div class="card">
-      <div class="card-title"><i class="ti ti-shield-check"></i> Access Control</div>
-      <div class="sr"><span class="sr-k"><i class="ti ti-id-badge"></i> Strict UUID Auth</span><span class="sr-v" style="color:var(--green-t)">● Active v9</span></div>
-      <div class="sr"><span class="sr-k"><i class="ti ti-toggle-right"></i> Configuration enabled/disabled</span><span class="sr-v" style="color:var(--green-t)">● Active</span></div>
-      <div class="sr"><span class="sr-k"><i class="ti ti-gauge"></i> Traffic Quota</span><span class="sr-v" style="color:var(--green-t)">● Active</span></div>
-      <div class="sr"><span class="sr-k"><i class="ti ti-calendar-x"></i> Expiry date</span><span class="sr-v" style="color:var(--green-t)">● Active</span></div>
-      <div class="sr"><span class="sr-k"><i class="ti ti-lock"></i> Public subscription page password</span><span class="sr-v" style="color:var(--green-t)">● Optional · SHA-256</span></div>
-    </div>
-  </div>
-</section>
 <section class="pg" id="pg-logs">
-  <div class="topbar"><div><div class="tb-title"><i class="ti ti-history"></i> Activity Logs</div><div class="tb-sub">Complete panel event history</div></div><div class="tb-right"><button class="btn btn-p btn-sm" onclick="loadActivity()"><i class="ti ti-refresh"></i></button></div></div>
+  <div class="topbar"><div><div class="tb-title"><i class="ti ti-history"></i> Logs</div><div class="tb-sub">Panel activity history and error log</div></div><div class="tb-right"><button class="btn btn-p btn-sm" onclick="loadActivity();loadErrs()"><i class="ti ti-refresh"></i> Refresh</button></div></div>
+  <div class="tabbar" data-tabgroup="lg">
+    <button class="tab-btn on" data-tab="activity" onclick="pgTab('lg','activity')"><i class="ti ti-history"></i> Activity</button>
+    <button class="tab-btn" data-tab="errors" onclick="pgTab('lg','errors')"><i class="ti ti-alert-triangle"></i> Errors <span class="badge bg-red" id="errs-badge">0</span></button>
+  </div>
+  <div class="tabpane on" data-tabgroup="lg" data-tab="activity">
   <div class="card"><div class="log-timeline" id="logs-list">—</div><div class="empty" id="logs-empty" style="display:none"><i class="ti ti-history-toggle"></i><p>No activity logs yet</p></div></div>
-</section>
-<section class="pg" id="pg-errors">
-  <div class="topbar"><div><div class="tb-title"><i class="ti ti-alert-triangle"></i> Errors</div></div><div class="tb-right"><span class="badge bg-red" id="errs-badge">0</span><button class="btn btn-p btn-sm" onclick="refreshAll()"><i class="ti ti-refresh"></i></button></div></div>
+  </div>
+  <div class="tabpane" data-tabgroup="lg" data-tab="errors">
   <div class="card"><div class="card-title"><i class="ti ti-bug"></i> Error Logs</div><div id="errs-full">—</div></div>
-</section>
-<section class="pg" id="pg-testws">
-  <div class="topbar"><div><div class="tb-title"><i class="ti ti-wifi"></i> WebSocket Test</div></div></div>
-  <div class="card" style="max-width:660px">
-    <div class="cl amber" style="margin-top:0;margin-bottom:12px"><i class="ti ti-alert-triangle"></i><span>Only registered active UUIDs may connect (this is a VLESS/WS test; XHTTP is tested from the client).</span></div>
-    <div class="form-row" style="margin-bottom:12px">
-      <div class="fg" style="flex:1"><label>UUID (must exist in configurations)</label><input class="fi" id="ws-uuid" placeholder="UUID of an active configuration" style="width:100%"></div>
-      <button class="btn btn-p" onclick="wsConn()"><i class="ti ti-plug-connected"></i> Connect</button>
-      <button class="btn btn-d" onclick="wsDisc()"><i class="ti ti-plug-x"></i> Disconnect</button>
-    </div>
-    <div class="form-row" style="margin-bottom:12px">
-      <input class="fi" id="ws-msg" placeholder="Test message..." style="flex:1">
-      <button class="btn btn-o" onclick="wsSend()"><i class="ti ti-send"></i> Send</button>
-    </div>
-    <div style="background:rgba(0,0,0,.3);border:1px solid var(--card-b);border-radius:10px;padding:14px;height:250px;overflow-y:auto;font-family:ui-monospace,monospace;font-size:10.5px;line-height:1.9" id="ws-log">
-      <p style="color:var(--t3)">Waiting for connection...</p>
-    </div>
   </div>
 </section>
 <section class="pg" id="pg-telegram">
   <div class="topbar">
     <div>
-      <div class="tb-title"><i class="ti ti-brand-telegram"></i> Telegram Bot</div>
+      <div class="tb-title"><i class="ti ti-brand-telegram"></i> Telegram</div>
       <div class="tb-sub">Manage Telegram bot for remote panel control</div>
     </div>
     <div class="tb-right">
@@ -948,29 +950,14 @@ __DASHBOARD_CSS__
 </section>
 <section class="pg" id="pg-settings">
   <div class="topbar"><div><div class="tb-title"><i class="ti ti-settings"></i> Settings</div></div></div>
-  <div class="g2">
-    <div class="srv-panel">
-      <div class="srv-hero">
-        <div class="srv-hero-icon"><i class="ti ti-server-2"></i></div>
-        <div class="srv-hero-text">
-          <div class="srv-hero-domain" id="set-host">—</div>
-          <div class="srv-hero-sub"><span class="dot dg pulse"></span> Online · OMIDIRAN</div>
-        </div>
-      </div>
-      <div class="srv-tiles">
-        <div class="srv-tile"><div class="srv-tile-icon"><i class="ti ti-route"></i></div><div class="srv-tile-text"><div class="srv-tile-label">Default port</div><div class="srv-tile-val">443 (TLS) · configurable per configuration</div></div></div>
-        <div class="srv-tile"><div class="srv-tile-icon"><i class="ti ti-versions"></i></div><div class="srv-tile-text"><div class="srv-tile-label">Version</div><div class="srv-tile-val">v2.5.0</div></div></div>
-        <div class="srv-tile"><div class="srv-tile-icon"><i class="ti ti-bolt"></i></div><div class="srv-tile-text"><div class="srv-tile-label">Framework</div><div class="srv-tile-val">FastAPI + Uvicorn</div></div></div>
-        <div class="srv-tile"><div class="srv-tile-icon"><i class="ti ti-device-floppy"></i></div><div class="srv-tile-text"><div class="srv-tile-label">Storage</div><div class="srv-tile-val">JSON File (/data)</div></div></div>
-        <div class="srv-tile" style="grid-column:1/-1">
-          <div class="srv-tile-icon"><i class="ti ti-world-pin"></i></div>
-          <div class="srv-tile-text">
-            <div class="srv-tile-label">IP · Server Location</div>
-            <div class="srv-tile-val" id="srv-info-full">—</div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="tabbar" data-tabgroup="st">
+    <button class="tab-btn on" data-tab="account" onclick="pgTab('st','account')"><i class="ti ti-user-shield"></i> Account &amp; Security</button>
+    <button class="tab-btn" data-tab="server" onclick="pgTab('st','server')"><i class="ti ti-server-2"></i> Server</button>
+    <button class="tab-btn" data-tab="appearance" onclick="pgTab('st','appearance')"><i class="ti ti-palette"></i> Appearance</button>
+    <button class="tab-btn" data-tab="diagnostics" onclick="pgTab('st','diagnostics')"><i class="ti ti-stethoscope"></i> Diagnostics</button>
+  </div>
+  <div class="tabpane on" data-tabgroup="st" data-tab="account">
+    <div class="g2">
     <div class="pw-panel">
       <div class="pw-hero">
         <div class="pw-hero-icon"><i class="ti ti-user-cog"></i></div>
@@ -1012,6 +999,81 @@ __DASHBOARD_CSS__
         <button class="pw-submit" onclick="changeCredentials()"><i class="ti ti-device-floppy"></i> Save account information</button>
       </div>
     </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-lock"></i> Encryption</div>
+      <div class="sr"><span class="sr-k"><i class="ti ti-certificate"></i> TLS/HTTPS</span><span class="sr-v" style="color:var(--green-t)">● Active (443)</span></div>
+      <div class="sr"><span class="sr-k"><i class="ti ti-fingerprint"></i> Fingerprint</span><span class="sr-v">Chrome Spoof</span></div>
+      <div class="sr"><span class="sr-k"><i class="ti ti-network"></i> Protocols</span><span class="sr-v">VLESS/WS + XHTTP Ultra</span></div>
+      <div class="sr"><span class="sr-k"><i class="ti ti-key"></i> Password hash</span><span class="sr-v">SHA-256+Salt</span></div>
+      <div class="sr"><span class="sr-k"><i class="ti ti-cookie"></i> Session</span><span class="sr-v">HttpOnly · 7 days</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-shield-check"></i> Access Control</div>
+      <div class="sr"><span class="sr-k"><i class="ti ti-id-badge"></i> Strict UUID Auth</span><span class="sr-v" style="color:var(--green-t)">● Active v9</span></div>
+      <div class="sr"><span class="sr-k"><i class="ti ti-toggle-right"></i> Configuration enabled/disabled</span><span class="sr-v" style="color:var(--green-t)">● Active</span></div>
+      <div class="sr"><span class="sr-k"><i class="ti ti-gauge"></i> Traffic Quota</span><span class="sr-v" style="color:var(--green-t)">● Active</span></div>
+      <div class="sr"><span class="sr-k"><i class="ti ti-calendar-x"></i> Expiry date</span><span class="sr-v" style="color:var(--green-t)">● Active</span></div>
+      <div class="sr"><span class="sr-k"><i class="ti ti-lock"></i> Public subscription page password</span><span class="sr-v" style="color:var(--green-t)">● Optional · SHA-256</span></div>
+    </div>
+      </div>
+    </div>
+  </div>
+  <div class="tabpane" data-tabgroup="st" data-tab="server">
+    <div style="max-width:720px">
+    <div class="srv-panel">
+      <div class="srv-hero">
+        <div class="srv-hero-icon"><i class="ti ti-server-2"></i></div>
+        <div class="srv-hero-text">
+          <div class="srv-hero-domain" id="set-host">—</div>
+          <div class="srv-hero-sub"><span class="dot dg pulse"></span> Online · OMIDIRAN</div>
+        </div>
+      </div>
+      <div class="srv-tiles">
+        <div class="srv-tile"><div class="srv-tile-icon"><i class="ti ti-route"></i></div><div class="srv-tile-text"><div class="srv-tile-label">Default port</div><div class="srv-tile-val">443 (TLS) · configurable per configuration</div></div></div>
+        <div class="srv-tile"><div class="srv-tile-icon"><i class="ti ti-versions"></i></div><div class="srv-tile-text"><div class="srv-tile-label">Version</div><div class="srv-tile-val">v2.0.0</div></div></div>
+        <div class="srv-tile"><div class="srv-tile-icon"><i class="ti ti-bolt"></i></div><div class="srv-tile-text"><div class="srv-tile-label">Framework</div><div class="srv-tile-val">FastAPI + Uvicorn</div></div></div>
+        <div class="srv-tile"><div class="srv-tile-icon"><i class="ti ti-device-floppy"></i></div><div class="srv-tile-text"><div class="srv-tile-label">Storage</div><div class="srv-tile-val">JSON File (/data)</div></div></div>
+        <div class="srv-tile" style="grid-column:1/-1">
+          <div class="srv-tile-icon"><i class="ti ti-world-pin"></i></div>
+          <div class="srv-tile-text">
+            <div class="srv-tile-label">IP · Server Location</div>
+            <div class="srv-tile-val" id="srv-info-full">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+  <div class="tabpane" data-tabgroup="st" data-tab="appearance">
+    <div class="card" id="fx-card" style="max-width:720px">
+      <div class="card-title"><i class="ti ti-sparkles"></i> Visual Effects</div>
+      <p style="font-size:11.5px;color:var(--t3);line-height:1.8;margin-bottom:14px">Controls the animated background, particles, glitch effects and the boot screen. Choose Lite or Off on slow phones. Saved on this device only.</p>
+      <div class="fx-seg" id="fx-seg">
+        <button type="button" data-fx="full" onclick="setFx('full')"><i class="ti ti-rocket"></i><b>Full</b><span>All effects</span></button>
+        <button type="button" data-fx="lite" onclick="setFx('lite')"><i class="ti ti-feather"></i><b>Lite</b><span>No particles or motion</span></button>
+        <button type="button" data-fx="off" onclick="setFx('off')"><i class="ti ti-player-stop"></i><b>Off</b><span>Plain and fastest</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="tabpane" data-tabgroup="st" data-tab="diagnostics">
+    <div id="pg-testws">
+  <div class="card" style="max-width:660px">
+    <div class="cl amber" style="margin-top:0;margin-bottom:12px"><i class="ti ti-alert-triangle"></i><span>Only registered active UUIDs may connect (this is a VLESS/WS test; XHTTP is tested from the client).</span></div>
+    <div class="form-row" style="margin-bottom:12px">
+      <div class="fg" style="flex:1"><label>UUID (must exist in configurations)</label><input class="fi" id="ws-uuid" placeholder="UUID of an active configuration" style="width:100%"></div>
+      <button class="btn btn-p" onclick="wsConn()"><i class="ti ti-plug-connected"></i> Connect</button>
+      <button class="btn btn-d" onclick="wsDisc()"><i class="ti ti-plug-x"></i> Disconnect</button>
+    </div>
+    <div class="form-row" style="margin-bottom:12px">
+      <input class="fi" id="ws-msg" placeholder="Test message..." style="flex:1">
+      <button class="btn btn-o" onclick="wsSend()"><i class="ti ti-send"></i> Send</button>
+    </div>
+    <div style="background:rgba(0,0,0,.3);border:1px solid var(--card-b);border-radius:10px;padding:14px;height:250px;overflow-y:auto;font-family:ui-monospace,monospace;font-size:10.5px;line-height:1.9" id="ws-log">
+      <p style="color:var(--t3)">Waiting for connection...</p>
+    </div>
+  </div>
+    </div>
   </div>
 </section>
 <section class="pg" id="pg-support">
@@ -1028,6 +1090,10 @@ __DASHBOARD_CSS__
       <a class="srv-tile" href="https://t.me/omid_gamingORG" target="_blank" style="text-decoration:none;cursor:pointer">
         <div class="srv-tile-icon"><i class="ti ti-speakerphone"></i></div>
         <div class="srv-tile-text"><div class="srv-tile-label">Telegram Channel</div><div class="srv-tile-val">@omid_gamingORG</div></div>
+      </a>
+      <a class="srv-tile" href="https://www.youtube.com/@omid_Gaming" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer">
+        <div class="srv-tile-icon"><i class="ti ti-brand-youtube"></i></div>
+        <div class="srv-tile-text"><div class="srv-tile-label">YouTube Channel</div><div class="srv-tile-val">@omid_Gaming</div></div>
       </a>
       <a class="srv-tile" href="https://github.com/omidiran-gaming/omidiran" target="_blank" style="text-decoration:none;cursor:pointer">
         <div class="srv-tile-icon"><i class="ti ti-brand-github"></i></div>
@@ -1066,6 +1132,7 @@ Object.assign(OMID_EN_TO_FA, {
   'OMID-IRAN PANEL · Login':'OMID-IRAN PANEL · ورود'
 });
 
+const OMID_EXACT_FA={"Groups": "گروه‌ها", "Subscription Links": "لینک‌های اشتراک", "Logs": "لاگ‌ها", "Activity": "فعالیت", "Errors": "خطاها", "Overview": "نمای کلی", "Traffic Details": "جزئیات ترافیک", "Account & Security": "حساب و امنیت", "Server": "سرور", "Appearance": "ظاهر", "Diagnostics": "عیب‌یابی", "Visual Effects": "جلوه‌های بصری", "Full": "کامل", "Lite": "سبک", "Off": "خاموش", "All effects": "همه افکت‌ها", "No particles or motion": "بدون ذرات و حرکت", "Plain and fastest": "ساده و سریع‌ترین", "Server Resources": "منابع سرور", "CPU": "پردازنده", "RAM": "رم", "Disk": "دیسک", "Network": "شبکه", "YouTube Channel": "کانال یوتیوب", "Down": "دانلود", "Up": "آپلود", "Telegram": "تلگرام", "Controls the animated background, particles, glitch effects and the boot screen. Choose Lite or Off on slow phones. Saved on this device only.": "پس‌زمینه‌ی متحرک، ذرات، افکت گلیچ و صفحه‌ی بوت رو کنترل می‌کنه. روی گوشی‌های ضعیف «سبک» یا «خاموش» رو انتخاب کن. فقط روی همین دستگاه ذخیره می‌شه.", "Panel activity history and error log": "تاریخچه‌ی فعالیت پنل و لاگ خطاها", "Groups with their own public pages, and the subscription links for v2ray apps": "گروه‌هایی با صفحه‌ی عمومی جدا، و لینک‌های اشتراک برای برنامه‌های v2ray"};
 const OMID_EN_RULES = Object.entries(OMID_EN_TO_FA)
   .sort((a,b)=>b[0].length-a[0].length);
 const OMID_TEXT_SOURCE = new WeakMap();
@@ -1106,6 +1173,9 @@ function omidTranslateText(raw, lang){
   const core=s.trim();
   if(Object.prototype.hasOwnProperty.call(OMID_EN_TO_FA,core)){
     return omidPreserveOuterSpace(s,OMID_EN_TO_FA[core]);
+  }
+  if(Object.prototype.hasOwnProperty.call(OMID_EXACT_FA,core)){
+    return omidPreserveOuterSpace(s,OMID_EXACT_FA[core]);
   }
   const dynamic=omidTranslateDynamic(core);
   if(dynamic!==null) return omidPreserveOuterSpace(s,dynamic);
@@ -1310,22 +1380,75 @@ function closeSb(){sb.classList.remove('open');overlay.classList.remove('show')}
 document.getElementById('open-sb').addEventListener('click',openSb);
 document.getElementById('close-sb').addEventListener('click',closeSb);
 overlay.addEventListener('click',closeSb);
-function navTo(name){
+/* Old page ids still work (e.g. navTo('errors')) and open the right tab of the merged page. */
+const OMID_PG_ALIAS={subscriptions:['subgroups','links'],traffic:['overview','traffic'],errors:['logs','errors'],security:['settings','account'],testws:['settings','diagnostics']};
+const OMID_PG_TABGROUP={overview:'ov',subgroups:'sg',logs:'lg',settings:'st'};
+function pgTab(group,key){
+  document.querySelectorAll('.tabbar[data-tabgroup="'+group+'"] .tab-btn').forEach(b=>b.classList.toggle('on',b.dataset.tab===key));
+  document.querySelectorAll('.tabpane[data-tabgroup="'+group+'"]').forEach(p=>p.classList.toggle('on',p.dataset.tab===key));
+  try{
+    if(group==='ov'&&key==='traffic')requestAnimationFrame(()=>{try{if(ch3)ch3.resize()}catch(e){}});
+    if(group==='ov'&&key==='main')fetchSys();
+    if(group==='sg'&&key==='links')loadSubsPage();
+    if(group==='lg'&&key==='errors')loadErrs();
+    if(group==='lg'&&key==='activity')loadActivity();
+    if(group==='st'&&key==='appearance')syncFx();
+  }catch(e){}
+}
+function navTo(name,tab){
+  if(OMID_PG_ALIAS[name]){const al=OMID_PG_ALIAS[name];name=al[0];tab=tab||al[1];}
   document.querySelectorAll('.nav-it').forEach(n=>n.classList.toggle('on',n.dataset.pg===name));
   document.querySelectorAll('.pg').forEach(p=>p.classList.toggle('on',p.id==='pg-'+name));
   const loaders={
-  links:loadLinks,
-  connections:loadConns,
-  errors:loadErrs,
-  subscriptions:loadSubsPage,
-  subgroups:loadSubs,
-  logs:loadActivity,
-  settings:loadAccount,
-  telegram:tgLoad
-};
+    overview:fetchSys,
+    links:loadLinks,
+    connections:loadConns,
+    subgroups:()=>{loadSubs();loadSubsPage();},
+    logs:()=>{loadActivity();loadErrs();},
+    settings:loadAccount,
+    telegram:tgLoad
+  };
   if(loaders[name])loaders[name]();
+  if(tab&&OMID_PG_TABGROUP[name])pgTab(OMID_PG_TABGROUP[name],tab);
   closeSb();window.scrollTo({top:0,behavior:'smooth'});
 }
+/* ── Server resources (dashboard card) ── */
+function fmtBytes(n){
+  if(n==null||isNaN(n))return '—';
+  const u=['B','KB','MB','GB','TB'];let i=0;
+  while(n>=1024&&i<u.length-1){n/=1024;i++}
+  return n.toFixed(i?1:0)+' '+u[i];
+}
+function setSysTile(id,pct,sub){
+  const v=document.getElementById('sys-'+id),b=document.getElementById('sys-'+id+'-bar'),t=document.getElementById('sys-'+id+'-sub');
+  if(v)v.textContent=(pct==null)?'—':Math.round(pct)+'%';
+  if(b)b.style.width=(pct==null?0:Math.max(0,Math.min(100,pct)))+'%';
+  if(t)t.textContent=sub||'—';
+}
+async function fetchSys(){
+  if(!document.getElementById('sys-card'))return;
+  try{
+    const r=await authF('/api/system');if(!r||!r.ok)return;
+    const d=await r.json();
+    const load=(d.load&&d.load.length)?' · load '+d.load.join(' / '):'';
+    setSysTile('cpu',d.cpu_percent,(d.cores?d.cores+' cores':'')+load);
+    setSysTile('ram',d.mem_percent,d.mem_total?fmtBytes(d.mem_used)+' / '+fmtBytes(d.mem_total):'');
+    setSysTile('disk',d.disk_percent,d.disk_total?fmtBytes(d.disk_used)+' / '+fmtBytes(d.disk_total):'');
+    const rx=document.getElementById('sys-rx'),tx=document.getElementById('sys-tx'),ns=document.getElementById('sys-net-sub'),mt=document.getElementById('sys-meta');
+    if(rx)rx.textContent=d.net_rx_bps==null?'—':fmtBytes(d.net_rx_bps)+'/s';
+    if(tx)tx.textContent=d.net_tx_bps==null?'—':fmtBytes(d.net_tx_bps)+'/s';
+    if(ns)ns.textContent=d.net_rx_total==null?'—':'Total ↓ '+fmtBytes(d.net_rx_total)+' · ↑ '+fmtBytes(d.net_tx_total);
+    if(mt)mt.textContent=(d.platform||'').indexOf('linux')===0?'Linux':(d.platform||'—');
+  }catch(e){}
+}
+/* ── Visual effects switch (Settings > Appearance) ── */
+function syncFx(){
+  const card=document.getElementById('fx-card');
+  if(card&&!window.omidSetFx){card.style.display='none';return;}
+  const cur=document.documentElement.getAttribute('data-fx')||'full';
+  document.querySelectorAll('#fx-seg button').forEach(b=>b.classList.toggle('on',b.dataset.fx===cur));
+}
+function setFx(m){if(window.omidSetFx){window.omidSetFx(m);syncFx();toast('Effects: '+m.charAt(0).toUpperCase()+m.slice(1),'ok');}}
 document.querySelectorAll('.nav-it').forEach(el=>el.addEventListener('click',()=>navTo(el.dataset.pg)));
 function openModal(id){document.getElementById(id).classList.add('open')}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
@@ -1873,7 +1996,7 @@ function qrFor(id){
   const el = document.getElementById(id);
   if(el) showQR(el.textContent, "Default Link");
 }
-function refreshAll(){fetchStats();fetchDefaultVless();loadServerInfo();loadLinks();if(document.getElementById('pg-subgroups').classList.contains('on'))loadSubs();if(document.getElementById('pg-subscriptions').classList.contains('on'))loadSubsPage();if(document.getElementById('pg-connections').classList.contains('on'))loadConns();if(document.getElementById('pg-logs').classList.contains('on'))loadActivity();toast('Refreshed','ok')}
+function refreshAll(){fetchStats();fetchSys();fetchDefaultVless();loadServerInfo();loadLinks();if(document.getElementById('pg-subgroups').classList.contains('on'))loadSubs();if(document.getElementById('pg-subgroups').classList.contains('on'))loadSubsPage();if(document.getElementById('pg-connections').classList.contains('on'))loadConns();if(document.getElementById('pg-logs').classList.contains('on')){loadActivity();loadErrs();}toast('Refreshed','ok')}
 async function loadAccount(){
   try{
     const r=await authF('/api/account');
@@ -3403,13 +3526,14 @@ document.addEventListener('DOMContentLoaded',async()=>{
   initCharts();
   document.getElementById('set-host').textContent=location.host;
   document.getElementById('sub-all-url')&&(document.getElementById('sub-all-url').textContent=location.protocol+'//'+location.host+'/sub-all');
-  fetchStats();fetchDefaultVless();loadLinks();loadSubs();
+  fetchStats();fetchSys();fetchDefaultVless();loadLinks();loadSubs();syncFx();
   tgLoad();
   setInterval(fetchStats,4000);
+  setInterval(()=>{if(!document.hidden&&document.getElementById('pg-overview').classList.contains('on'))fetchSys();},4000);
   setInterval(()=>{
     if(document.getElementById('pg-links').classList.contains('on'))loadLinks();
     if(document.getElementById('pg-subgroups').classList.contains('on'))loadSubs();
-    if(document.getElementById('pg-subscriptions').classList.contains('on'))loadSubsPage();
+    if(document.getElementById('pg-subgroups').classList.contains('on'))loadSubsPage();
     if(document.getElementById('pg-connections').classList.contains('on'))loadConns();
     if(document.getElementById('pg-logs').classList.contains('on'))loadActivity();
   },5000);
@@ -3499,3 +3623,8 @@ DASHBOARD_HTML = (
     .replace("__LOGO_B64__", LOGO_B64)
     .replace("__LANG_CENTER__", LANG_CENTER_JS)
 )
+
+# OMID // NEON ARENA — gaming visual layer (set OMID_SKIN=off to disable)
+from gaming_skin import inject_gaming_skin
+LOGIN_HTML = inject_gaming_skin(LOGIN_HTML, "login")
+DASHBOARD_HTML = inject_gaming_skin(DASHBOARD_HTML, "dash")

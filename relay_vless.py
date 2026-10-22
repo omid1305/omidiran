@@ -18,7 +18,7 @@ from main import (
     logger,
     is_link_allowed,
     is_ip_allowed,
-    save_state,
+    request_save,
     log_activity,
     now_ir,
 )
@@ -198,7 +198,7 @@ async def websocket_tunnel(ws: WebSocket, uuid: str):
             except asyncio.CancelledError:
                 pass
 
-        asyncio.create_task(save_state())
+        request_save()
 
     except WebSocketDisconnect:
         pass

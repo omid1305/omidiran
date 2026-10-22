@@ -17,6 +17,7 @@
 # html[data-theme="light"].
 # ═══════════════════════════════════════════════════════════════════════
 
+from gaming_skin import inject_gaming_skin  # OMID // NEON ARENA visual layer
 from pages import LOGO_B64
 
 
@@ -850,7 +851,7 @@ __THEME_CSS__
           <div class="settings-label">OMID Network</div>
           <div class="settings-sub" data-i18n="version">Version</div>
         </div>
-        <div class="settings-value">v2.5.0</div>
+        <div class="settings-value">v2.0.0</div>
       </div>
     </div>
   </section>
@@ -1426,6 +1427,7 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ()=
 </body></html>'''
 
 PUBLIC_PAGE_HTML_TEMPLATE = PUBLIC_PAGE_HTML_TEMPLATE.replace("__LOGO_B64__", LOGO_B64).replace("__THEME_CSS__", _THEME_CSS)
+PUBLIC_PAGE_HTML_TEMPLATE = inject_gaming_skin(PUBLIC_PAGE_HTML_TEMPLATE, "public")
 
 
 def get_public_page_html(uuid_key: str) -> str:
@@ -2113,6 +2115,7 @@ async function load(){
 </body></html>'''
 
 SINGLE_CONFIG_HTML_TEMPLATE = SINGLE_CONFIG_HTML_TEMPLATE.replace("__LOGO_B64__", LOGO_B64).replace("__THEME_CSS__", _THEME_CSS)
+SINGLE_CONFIG_HTML_TEMPLATE = inject_gaming_skin(SINGLE_CONFIG_HTML_TEMPLATE, "public")
 
 
 def get_single_config_page_html(uuid: str) -> str:
@@ -2933,6 +2936,7 @@ async function load(){
 </body></html>'''
 
 ADMIN_ALL_HTML_TEMPLATE = ADMIN_ALL_HTML_TEMPLATE.replace("__LOGO_B64__", LOGO_B64).replace("__THEME_CSS__", _THEME_CSS)
+ADMIN_ALL_HTML_TEMPLATE = inject_gaming_skin(ADMIN_ALL_HTML_TEMPLATE, "admin")
 
 
 def get_admin_all_page_html() -> str:

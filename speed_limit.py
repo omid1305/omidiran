@@ -32,7 +32,18 @@ class _Bucket:
             self.tokens = min(self.capacity, self.tokens + elapsed * self.rate)
 
     async def consume(self, n: int):
-        """تا وقتی n بایت توکن آماده نشه، به‌صورت غیرمسدودکننده (async sleep) صبر می‌کنه."""
+        """تا وقتی n بایت توکن آماده نشه، به‌صورت غیرمسدودکننده (async sleep) صبر می‌کنه.
+
+        چانک‌های بزرگ‌تر از ظرفیت bucket (مثلاً 256KB/512KB در برابر 128KB) قبلاً
+        هرگز satisfy نمی‌شدن (tokens سقف capacity داره) و اتصال تا ابد گیر می‌کرد؛
+        حالا هزینه‌ی چانک تکه‌تکه (حداکثر به اندازه‌ی capacity) پرداخت می‌شه."""
+        slice_max = max(int(self.capacity), 1)
+        while n > 0:
+            take = min(n, slice_max)
+            await self._consume_slice(take)
+            n -= take
+
+    async def _consume_slice(self, n: int):
         while True:
             self._refill()
             if self.tokens >= n:

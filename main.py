@@ -18,6 +18,7 @@ from fastapi import FastAPI, Request, HTTPException, WebSocket, WebSocketDisconn
 from fastapi.responses import Response, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+from concurrent.futures import ThreadPoolExecutor
 import httpx
 import logging
 
@@ -91,7 +92,7 @@ async def lifespan(app: FastAPI):
     autosave_task = asyncio.create_task(_autosave_loop(), name="omid-state-autosave")
     log_activity("system", "Server started", "ok")
     logger.info(
-        f"OMID-IRAN PANEL v2.5.0 started on port {CONFIG['port']} "
+        f"OMID-IRAN PANEL v2.0.0 started on port {CONFIG['port']} "
         f"| DATA_DIR={DATA_DIR} | STATE_FILE={DATA_FILE}"
     )
 
@@ -164,6 +165,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+_DISK_EXECUTOR = ThreadPoolExecutor(max_workers=1, thread_name_prefix="omid-disk")
+
+def _dump_and_write_state(path: Path, data: dict) -> int:
+    payload = json.dumps(data, ensure_ascii=False, indent=2)
+    _write_state_file_sync(path, payload)
+    return len(payload)
 
 def _write_state_file_sync(path: Path, payload: str) -> None:
     """Atomically write state to disk and force it through the filesystem cache."""
@@ -257,11 +265,38 @@ async def save_state():
                 "telegram": dict(TELEGRAM),
                 "saved_at": datetime.now().isoformat(),
             }
-            payload = json.dumps(data, ensure_ascii=False, indent=2)
-            await asyncio.to_thread(_write_state_file_sync, DATA_FILE, payload)
-            logger.debug(f"State saved: {DATA_FILE} ({len(payload)} bytes)")
+            # Serialize + fsync on a DEDICATED single thread. Using the default
+            # executor here let slow fsyncs on the Railway volume starve the
+            # threads that asyncio.open_connection() needs for DNS lookups,
+            # which froze every relay (WS and XHTTP) at the same time.
+            loop = asyncio.get_running_loop()
+            size = await loop.run_in_executor(
+                _DISK_EXECUTOR, _dump_and_write_state, DATA_FILE, data
+            )
+            logger.debug(f"State saved: {DATA_FILE} ({size} bytes)")
         except Exception as e:
             logger.exception(f"Could not save state to {DATA_FILE}: {e}")
+
+# ── Coalesced, non-blocking save (used by relays on every connection close) ──
+# Previously every closed tunnel spawned its own full save_state() (JSON dump +
+# fsync of file and directory). Under normal browsing that is dozens of full
+# rewrites per second, which starves the event loop/threads and made all
+# tunnels stall together. request_save() merges any burst into ONE write.
+SAVE_DEBOUNCE = 2.0
+_save_task: asyncio.Task | None = None
+
+async def _debounced_save() -> None:
+    await asyncio.sleep(SAVE_DEBOUNCE)
+    await save_state()
+
+def request_save() -> None:
+    """Schedule a state save without blocking; bursts collapse into one write.
+    Must be called from the event loop. The periodic autosave remains the
+    safety net for anything that changes while a save is already running."""
+    global _save_task
+    if _save_task is not None and not _save_task.done():
+        return
+    _save_task = asyncio.create_task(_debounced_save(), name="omid-state-save")
 
 async def _autosave_loop() -> None:
     """Periodic safety net for abrupt deploy/restart cases where shutdown hooks
@@ -1195,6 +1230,104 @@ async def get_stats(_=Depends(require_auth)):
     }
 
 # ── Activity Logs ─────────────────────────────────────────────────────────────
+# ── System resources (dashboard "Server Resources" card) ─────────────────────
+# psutil-free: reads /proc (+ cgroup limits inside containers). On platforms
+# without /proc every field degrades to null and the card shows "—".
+_SYS_STATE: dict = {}
+
+def _sys_cpu_times():
+    with open("/proc/stat") as f:
+        vals = [int(x) for x in f.readline().split()[1:]]
+    idle = vals[3] + (vals[4] if len(vals) > 4 else 0)   # idle + iowait
+    return idle, sum(vals[:8])                           # guest is already inside user/nice
+
+def _sys_net_bytes():
+    rx = tx = 0
+    with open("/proc/net/dev") as f:
+        for line in list(f)[2:]:
+            name, data = line.split(":", 1)
+            if name.strip() == "lo":
+                continue
+            cols = data.split()
+            rx += int(cols[0])
+            tx += int(cols[8])
+    return rx, tx
+
+def _sys_memory():
+    info = {}
+    with open("/proc/meminfo") as f:
+        for line in f:
+            k, v = line.split(":", 1)
+            info[k] = int(v.split()[0]) * 1024
+    total = info["MemTotal"]
+    used = total - info.get("MemAvailable", info.get("MemFree", 0))
+    # Inside a container prefer the cgroup limit (cgroup v2, then v1)
+    for lim, cur, stat, key in (
+        ("/sys/fs/cgroup/memory.max", "/sys/fs/cgroup/memory.current", "/sys/fs/cgroup/memory.stat", "inactive_file"),
+        ("/sys/fs/cgroup/memory/memory.limit_in_bytes", "/sys/fs/cgroup/memory/memory.usage_in_bytes", "/sys/fs/cgroup/memory/memory.stat", "total_inactive_file"),
+    ):
+        try:
+            lim_s = open(lim).read().strip()
+            if lim_s == "max" or int(lim_s) >= total:
+                continue
+            c_total = int(lim_s)
+            c_used = int(open(cur).read().strip())
+            try:
+                for line in open(stat):
+                    if line.startswith(key + " "):
+                        c_used -= int(line.split()[1])
+                        break
+            except Exception:
+                pass
+            return c_total, max(0, c_used)
+        except Exception:
+            continue
+    return total, used
+
+@app.get("/api/system")
+async def get_system(_=Depends(require_auth)):
+    import shutil
+    now = time.monotonic()
+    out = {
+        "platform": _sys.platform, "cores": os.cpu_count(), "load": None,
+        "cpu_percent": None, "mem_total": None, "mem_used": None, "mem_percent": None,
+        "disk_total": None, "disk_used": None, "disk_percent": None,
+        "net_rx_bps": None, "net_tx_bps": None, "net_rx_total": None, "net_tx_total": None,
+    }
+    try:
+        out["load"] = [round(x, 2) for x in os.getloadavg()]
+    except Exception:
+        pass
+    # CPU % and network rate are deltas between two samples (>= 1s apart)
+    try:
+        cpu, net = _sys_cpu_times(), _sys_net_bytes()
+        st = _SYS_STATE
+        if "t" not in st:
+            await asyncio.sleep(0.25)
+            st.update(t=now, cpu=cpu, net=net, rates=None)
+            cpu, net, now = _sys_cpu_times(), _sys_net_bytes(), time.monotonic()
+        if now - st["t"] >= 1.0 or st.get("rates") is None:
+            dt = max(now - st["t"], 0.001)
+            d_idle, d_total = cpu[0] - st["cpu"][0], cpu[1] - st["cpu"][1]
+            pct = round(max(0.0, min(100.0, 100.0 * (1 - d_idle / d_total))), 1) if d_total > 0 else None
+            st["rates"] = (pct, max(0, (net[0] - st["net"][0]) / dt), max(0, (net[1] - st["net"][1]) / dt))
+            st.update(t=now, cpu=cpu, net=net)
+        out["cpu_percent"], out["net_rx_bps"], out["net_tx_bps"] = st["rates"]
+        out["net_rx_total"], out["net_tx_total"] = net
+    except Exception:
+        pass
+    try:
+        total, used = _sys_memory()
+        out.update(mem_total=total, mem_used=used, mem_percent=round(100.0 * used / total, 1) if total else None)
+    except Exception:
+        pass
+    try:
+        du = shutil.disk_usage("/")
+        out.update(disk_total=du.total, disk_used=du.used, disk_percent=round(100.0 * du.used / du.total, 1))
+    except Exception:
+        pass
+    return out
+
 @app.get("/api/activity")
 async def get_activity(_=Depends(require_auth)):
     return {"logs": list(activity_logs)[-150:]}
@@ -2060,4 +2193,9 @@ async def test_ws_redirect():
     return HTMLResponse(content="<script>location.href='/dashboard'</script>")
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=CONFIG["port"], log_level="info", workers=1)
+    uvicorn.run(
+        "main:app", host="0.0.0.0", port=CONFIG["port"], log_level="info", workers=1,
+        ws_ping_interval=20.0,    # server→client WS ping keeps idle tunnels alive through the edge proxy
+        ws_ping_timeout=60.0,     # tolerate short event-loop stalls / slow mobile links (default 20s kills the tunnel)
+        timeout_keep_alive=75,    # default 5s races with the proxy reusing idle upstream connections (XHTTP POSTs)
+    )

@@ -1059,7 +1059,7 @@ async def websocket_tunnel_vmess(websocket: WebSocket, uuid: str):
             except Exception:
                 pass
 
-        asyncio.create_task(main.save_state())
+        main.request_save()
 
     except WebSocketDisconnect:
         pass
